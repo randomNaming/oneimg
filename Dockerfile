@@ -32,6 +32,8 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
 COPY package.json pnpm-lock.yaml ./
 COPY public ./public
+# Copy next.config.mjs (required for basePath and other runtime configs)
+COPY --from=build /app/next.config.mjs ./next.config.mjs
 
 EXPOSE 3000
 

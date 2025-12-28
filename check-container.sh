@@ -29,7 +29,12 @@ curl -I http://127.0.0.1:3000/meigui 2>&1 | head -5 || echo "无法访问"
 # 检查容器内的构建配置
 echo ""
 echo "5. 检查容器内的 next.config.mjs："
-docker exec oneimg cat /app/next.config.mjs 2>/dev/null || echo "无法读取配置文件"
+if docker exec oneimg test -f /app/next.config.mjs 2>/dev/null; then
+    echo "配置文件存在，内容："
+    docker exec oneimg cat /app/next.config.mjs 2>/dev/null
+else
+    echo "❌ 配置文件不存在！这是问题所在。"
+fi
 
 # 检查 .next 目录
 echo ""
