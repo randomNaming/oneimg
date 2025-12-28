@@ -3,7 +3,8 @@ FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
-RUN npm install -g pnpm
+# Install pnpm 9 (required for lockfileVersion 6.0)
+RUN npm install -g pnpm@9
 
 # Production dependencies stage
 FROM base AS prod-deps
