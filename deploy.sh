@@ -36,10 +36,15 @@ if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
     docker rm $CONTAINER_NAME 2>/dev/null || true
 fi
 
+# 清理旧的构建缓存（可选，如果需要完全重新构建）
+# echo "清理旧的构建缓存..."
+# docker builder prune -f
+
 # 构建镜像
 echo "开始构建 Docker 镜像..."
 echo "镜像名称: $IMAGE_NAME:$IMAGE_TAG"
-docker build --platform linux/amd64 -t $IMAGE_NAME:$IMAGE_TAG .
+echo "注意: 构建过程可能需要几分钟，请耐心等待..."
+docker build --platform linux/amd64 --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
 
 if [ $? -eq 0 ]; then
     echo "镜像构建成功！"
@@ -58,17 +63,34 @@ docker run -d \
     $IMAGE_NAME:$IMAGE_TAG
 
 if [ $? -eq 0 ]; then
-    echo "=========================================="
-    echo "部署成功！"
-    echo "=========================================="
-    echo "容器名称: $CONTAINER_NAME"
-    echo "访问地址: http://localhost:$PORT"
-    echo ""
-    echo "查看容器状态: docker ps -a | grep $CONTAINER_NAME"
-    echo "查看容器日志: docker logs -f $CONTAINER_NAME"
-    echo "停止容器: docker stop $CONTAINER_NAME"
-    echo "启动容器: docker start $CONTAINER_NAME"
-    echo "删除容器: docker rm -f $CONTAINER_NAME"
+    echo "容器启动命令执行成功，等待容器就绪..."
+    sleep 5
+    
+    # 检查容器是否正在运行
+    if docker ps | grep -q $CONTAINER_NAME; then
+        echo "=========================================="
+        echo "部署成功！"
+        echo "=========================================="
+        echo "容器名称: $CONTAINER_NAME"
+        echo "访问地址: http://localhost:$PORT/meigui"
+        echo ""
+        echo "测试访问:"
+        echo "  curl http://127.0.0.1:$PORT/meigui"
+        echo ""
+        echo "常用命令:"
+        echo "  查看容器状态: docker ps -a | grep $CONTAINER_NAME"
+        echo "  查看容器日志: docker logs -f $CONTAINER_NAME"
+        echo "  停止容器: docker stop $CONTAINER_NAME"
+        echo "  启动容器: docker start $CONTAINER_NAME"
+        echo "  删除容器: docker rm -f $CONTAINER_NAME"
+        echo ""
+        echo "诊断脚本:"
+        echo "  bash check-container.sh"
+    else
+        echo "警告: 容器启动后立即停止，请检查日志："
+        echo "  docker logs $CONTAINER_NAME"
+        exit 1
+    fi
 else
     echo "容器启动失败！"
     exit 1
