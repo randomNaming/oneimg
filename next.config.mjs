@@ -4,7 +4,8 @@
 // To enable in local development, uncomment the line below or set ENABLE_CLOUDFLARE_DEV=1
 const nextConfig = {
   // 配置子路径访问，用于通过 /meigui 路径访问应用
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/meigui',
+  // basePath 会自动处理所有路由和静态资源路径
+  basePath: '/meigui',
 }
 
 // Cloudflare dev mode initialization - disabled for Docker builds
