@@ -18,6 +18,9 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . . 
+# Skip Cloudflare dev mode initialization during Docker build
+ENV SKIP_CLOUDFLARE_DEV=1
+ENV NODE_ENV=production
 RUN pnpm run build
 
 # Final image (minimal size)
